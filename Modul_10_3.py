@@ -30,6 +30,7 @@ class Bank:
                 print('Запрос отклонен, недостаточно средств')
                 self.lock.acquire()
 
+
 bk = Bank()
 th1 = threading.Thread(target=Bank.deposit, args=(bk,))
 th2 = threading.Thread(target=Bank.take, args=(bk,))
