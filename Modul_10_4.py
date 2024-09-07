@@ -4,11 +4,11 @@ from time import sleep
 import queue
 
 
-
 class Table:
     def __init__(self, number):
         self.number = number
         self.guest = None
+
 
 class Guest(Thread):
     def __init__(self, name):
@@ -16,8 +16,9 @@ class Guest(Thread):
         self.name = name
 
     def run(self):
-        a = randint(3,10)
+        a = randint(3, 10)
         sleep(a)
+
 
 class Cafe:
     def __init__(self, *tabl_):
@@ -27,37 +28,47 @@ class Cafe:
         self.queue = queue.Queue()
 
     def guest_arrival(self, *guests):
+        self.guests = []
         for guest in guests:
+            self.guests.append(guest)
             for table in self.tables:
                 if table.guest == None:
                     table.guest = guest
-                    guest.start()
+                    table.guest.start()
                     print(f'{guest.name} сел(-а) за стол номер {table.number}')
                 else:
                     self.queue.put(guest)
                     print(f'{guest.name} в очереди')
 
+    def discuss_guests(self):
+        # try:
+        for table in self.tables:
+            if table.guest != None and not table.guest.is_alive():
+                print(f'{table.guest.name} покушал и ушел')
+                print(f'Стол номер {table.number} свободен')
+                table.guest = None
+            if table.guest == None and not self.queue.empty():
+                table.guest = self.queue.get()
+                print(f'{table.guest.name} вышел из очереди и сел за стол номер {table.number}')
+                table.guest.start()
+        #
+        # except self.queue.empty():
+        #     print('Очередь пуста')
 
 
-
-#
-# def run(self):
-#         print('Лодка вышла в море...', flush=True)
-#         for fisher in self.fishers:
-#             fisher.start()
-#         while True:
-#             try:
-#                 # Этот метод у очереди - атомарный и блокирующий,
-#                 # Поток приостанавливается, пока нет элементов в очереди
-#                 fish = self.catcher.get(timeout=1)
-#                 print(f'Приемщик принял {fish} и положил в садок', flush=True)
-#                 self.fish_tank[fish] += 1
-#             except queue.Empty:
-#                 print(f'Приемщику нет рыбы в течении 1 секунды', flush=True)
-#                 if not any(fisher.is_alive() for fisher in self.fishers):
-#                     break
-#         for fisher in self.fishers:
-#             fisher.join()
-#         print(f'Лодка возвращается домой с {self.fish_tank}', flush=True)
-
+tables = [Table(number) for number in range(1, 6)]
+guests_names = [
+'Maria', 'Oleg', 'Vakhtang', 'Sergey', 'Darya', 'Arman',
+'Vitoria', 'Nikita', 'Galina', 'Pavel', 'Ilya', 'Alexandra'
+]
+# Создание гостей
+guests = [Guest(name) for name in guests_names]
+# Заполнение кафе столами
+cafe = Cafe(*tables)
+# Приём гостей
+cafe.guest_arrival(*guests)
+# Обслуживание гостей
+cafe.discuss_guests()
+for guest in guests:
+    guest.join()
 
