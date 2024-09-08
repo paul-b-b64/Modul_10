@@ -30,15 +30,17 @@ class Cafe:
     def guest_arrival(self, *guests):
         self.guests = []
         for guest in guests:
-            self.guests.append(guest)
-            for table in self.tables:
-                if table.guest == None:
-                    table.guest = guest
-                    table.guest.start()
-                    print(f'{guest.name} сел(-а) за стол номер {table.number}')
-                else:
-                    self.queue.put(guest)
-                    print(f'{guest.name} в очереди')
+            if all(table.guest != None for table in self.tables):
+                self.queue.put(guest)
+                print(f'{guest.name} в очереди')
+            else:
+                for table in self.tables:
+                    if table.guest == None:
+                        table.guest = guest
+                        guest.start()
+                        self.guests.append(guest)
+                        print(f'{guest.name} сел(-а) за стол номер {table.number}')
+                        break
 
     def discuss_guests(self):
         # try:
@@ -69,6 +71,6 @@ cafe = Cafe(*tables)
 cafe.guest_arrival(*guests)
 # Обслуживание гостей
 cafe.discuss_guests()
-for guest in guests:
-    guest.join()
-
+# for guest in guests:
+#     guest.join()
+#
