@@ -1,6 +1,7 @@
 import datetime
 import multiprocessing
 
+
 # 0:00:03.758891 (линейный)
 # 0:00:01.742263 (многопроцессный)
 
@@ -13,6 +14,7 @@ def read_info(name):
             if not line:
                 break
             all_data.append(line)
+
 
 filenames = [f'./Files/file {number}.txt' for number in range(1, 5)]
 
@@ -30,4 +32,3 @@ if __name__ == '__main__':
         pool.map(read_info, filenames)
     end = datetime.datetime.now()
     print(end - start)
-
